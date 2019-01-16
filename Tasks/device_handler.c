@@ -227,15 +227,6 @@ void Device_DISARM(U8 user)
  *----------------------------------------------------------------------------------*/
 __task void t_Device_Handler(void)
 {	
-	if(TEST_INPUT_READ())	// Кнопка тест отжата
-	{
-		LED_ACB_GREEN();
-	}
-	else
-	{
-		LED_ACB_RED();
-	}
-	
 	for(;;)
 	{
 		os_dly_wait(200);
@@ -304,68 +295,6 @@ __task void t_Device_Handler(void)
 				TM_LED_OFF();
 			}
 		}
-		
-		/* Состояние сети АКБ *****************************************/
-		if(TEST_INPUT_READ())	// Кнопка тест отжата
-		{
-			if(Device_Status.old.acb_err != 0)
-			if(++chatter_cnt_test > CHATTER_REMOVE)
-			{
-				Device_Status.new.acb_err = 0;
-				chatter_cnt_test = 0;
-				LED_ACB_GREEN();
-			}
-			
-		}
-		else // Кнопка тест нажата
-		{				
-			if(Device_Status.old.acb_err == 0)
-			if(++chatter_cnt_test > CHATTER_REMOVE)
-			{
-				Device_Status.new.acb_err = 1;
-				chatter_cnt_test = 0;
-				LED_ACB_RED();
-			}
-			
-		}
-		
-//		if(ADC_buf[3] < 0x0fff)
-//		{
-//			if(Device_Status.old.acb_err == 0)
-//				Device_Status.new.acb_err = 1;
-//			LED_ACB_GREEN();
-//		}
-//		else
-//		{
-//			if(Device_Status.old.acb_err != 0)
-//				Device_Status.new.acb_err = 0;
-//			LED_ACB_RED();
-//		}
-		
-//		if(localtime > acb_timer)
-//		{
-//			if(acb_err_cnt > 10)
-//			{// АКБ отсутствует или разряжен
-//				if(Device_Status.old.acb_err == 0)
-//					Device_Status.new.acb_err = 1;
-//				LED_ACB_RED();
-//			}
-//			else
-//			{// АКБ в норме
-//				if(Device_Status.old.acb_err != 0)
-//					Device_Status.new.acb_err = 0;
-//				LED_ACB_GREEN();
-//			}
-//			acb_err_cnt = 0;
-//			acb_timer = localtime + ACB_LISTEN_TIMEOUT;
-//		}
-//		else
-//		{
-//			if(ADC_buf[1] < 0x0fff)
-//			{
-//				acb_err_cnt++;
-//			}
-//		}
 		
 		/* Состояние сети 220В *****************************************/
 		if(!ADC_buf[0])
