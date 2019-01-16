@@ -19,7 +19,7 @@
 
 /* Task ID -------------------------------------------------------------------------*/
 OS_TID tid_Main_Modem_Handler;	// ID задачи t_Main_Modem_Handler
-OS_TID tid_Aux_Modem_Handler;		// ID задачи t_Aux_Modem_Handler
+OS_TID tid_Aux_Modem_Handler;	// ID задачи t_Aux_Modem_Handler
 
 
 /* Variables -----------------------------------------------------------------*/
@@ -28,33 +28,33 @@ U32 tcp_recv_timeout = 0;
 
 
 /* Enums ---------------------------------------------------------------------*/
-Main_AT_Status_t Main_AT_Status = 0;														// Статус main канала
-AT_Start_Schedule_t AT_Start_Schedule = 0;											// Начало работы с модемом
-AT_Socket_Open_Schedule_t AT_Socket_Open_Schedule = 0;					// Порядок открытия сокета
-AT_Socket_Send_Schedule_t AT_Socket_Send_Schedule = 0;					// Порядок передачи сообщения через сокет
-AT_Socket_Receive_Schedule_t AT_Socket_Receive_Schedule = 0;		// Порядок получения сообщения через сокет
-AT_Socket_Close_Schedule_t AT_Socket_Close_Schedule = 0;				// Порядок закрытия сокета
+Main_AT_Status_t Main_AT_Status = 0;				// Статус main канала
+AT_Start_Schedule_t AT_Start_Schedule = 0;			// Начало работы с модемом
+AT_Socket_Open_Schedule_t AT_Socket_Open_Schedule = 0;		// Порядок открытия сокета
+AT_Socket_Send_Schedule_t AT_Socket_Send_Schedule = 0;		// Порядок передачи сообщения через сокет
+AT_Socket_Receive_Schedule_t AT_Socket_Receive_Schedule = 0;	// Порядок получения сообщения через сокет
+AT_Socket_Close_Schedule_t AT_Socket_Close_Schedule = 0;	// Порядок закрытия сокета
 
-Aux_AT_Status_t Aux_AT_Status = 0;															// Статус aux канала
-AT_Modem_Poll_Schedule_t AT_Modem_Poll_Schedule = 0;						// Периодические опросы модема
-AT_Balance_Schedule_t AT_Balance_Schedule = 0;									// Запрос баланса
+Aux_AT_Status_t Aux_AT_Status = 0;				// Статус aux канала
+AT_Modem_Poll_Schedule_t AT_Modem_Poll_Schedule = 0;		// Периодические опросы модема
+AT_Balance_Schedule_t AT_Balance_Schedule = 0;			// Запрос баланса
 
 
 /* Structs -------------------------------------------------------------------*/
-Modem_Stat_t Modem_Stat;							// Статусы модема
-Main_AT_Command_t Main_AT_Command;		// АТ команды main канала
-Aux_AT_Command_t Aux_AT_Command;			// АТ команды aux канала
+Modem_Stat_t Modem_Stat;		// Статусы модема
+Main_AT_Command_t Main_AT_Command;	// АТ команды main канала
+Aux_AT_Command_t Aux_AT_Command;	// АТ команды aux канала
 AT_Socket_Tx_Msg_t AT_Socket_Tx_Msg;	// Сообщение для отправки по GPRS
 AT_Socket_Rx_Msg_t AT_Socket_Rx_Msg;	// Сообщение принятое по GPRS
-Modem_Info_t Modem_Info;							// Информация о модеме и операторе
-Balance_t balance;										// Структура для запроса и хранения баланса
+Modem_Info_t Modem_Info;		// Информация о модеме и операторе
+Balance_t balance;			// Структура для запроса и хранения баланса
 
 
 /* Functions -----------------------------------------------------------------*/
 /**
-	*	@brief	main_clear_stats()
-	*	@note		Сброс всех планировщиков main канала
-	*/
+  * @brief	main_clear_stats()
+  * @note	Сброс всех планировщиков main канала
+  */
 void main_clear_stats(void)
 {
 	Main_AT_Status = NULL;
@@ -65,9 +65,9 @@ void main_clear_stats(void)
 }
 
 /**
-	*	@brief	aux_clear_stats()
-	*	@note		Сброс всех планировщиков main канала
-	*/
+ * @brief	aux_clear_stats()
+ * @note	Сброс всех планировщиков main канала
+ */
 void aux_clear_stats(void)
 {
 	Aux_AT_Status = NULL;
@@ -76,9 +76,9 @@ void aux_clear_stats(void)
 }
 
 /**
-	*	@brief	main_clean_rx_buf()
-	*	@note		Очистка приёмного буфера и флагов main канала
-	*/
+ * @brief	main_clean_rx_buf()
+ * @note	Очистка приёмного буфера и флагов main канала
+ */
 void main_clean_rx_buf(void)
 {
 	USART3_Rx_Clear();
@@ -86,9 +86,9 @@ void main_clean_rx_buf(void)
 }
 
 /**
-	*	@brief	aux_clean_rx_buf()
-	*	@note		Очистка приёмного буфера и флагов aux канала
-	*/
+ * @brief	aux_clean_rx_buf()
+ * @note	Очистка приёмного буфера и флагов aux канала
+ */
 void aux_clean_rx_buf(void)
 {
 	USART1_Rx_Clear();
@@ -96,12 +96,12 @@ void aux_clean_rx_buf(void)
 }
 
 /**
-	*	@brief	num_to_char()
-	*	@note		Конвертировать число в строку
-	* @param	pbuf: буфер для записи строки
-	* @param	buf_len: размер буфера
-	* @param	num: конвертируемое число
-	*/
+ * @brief	num_to_char()
+ * @note	Конвертировать число в строку
+ * @param	pbuf: буфер для записи строки
+ * @param	buf_len: размер буфера
+ * @param	num: конвертируемое число
+ */
 void num_to_char(char *pbuf, U8 buf_len, U16 num)
 {
 	U8 i, j;
@@ -127,12 +127,12 @@ void num_to_char(char *pbuf, U8 buf_len, U16 num)
 }
 
 /**
-	*	@brief	char_to_num()
-	*	@note		Конвертировать строку в число
-	* @param	pbuf: буфер для записи строки
-	* @param	buf_len: размер буфера
-	* @param	num: конвертируемое число
-	*/
+ * @brief	char_to_num()
+ * @note	Конвертировать строку в число
+ * @param	pbuf: буфер для записи строки
+ * @param	buf_len: размер буфера
+ * @param	num: конвертируемое число
+ */
 U16 char_to_num(const char *pbuf, U8 buf_len)
 {
 	U8 i, j, x;
@@ -153,12 +153,12 @@ U16 char_to_num(const char *pbuf, U8 buf_len)
 }
 
 /**
-	*	@brief	Main_AT_send()
-	*	@note		Отправка АТ команд модему по aux каналу
-	*	@param	at_cmd: ссылка на строку с командой
-	* @param	cmd_len: размер команды (если ноль, то вычисляется размер строки)
-	*	@param	cmnd_num: номер команды в расписании
-	*/
+ * @brief	Main_AT_send()
+ * @note	Отправка АТ команд модему по aux каналу
+ * @param	at_cmd: ссылка на строку с командой
+ * @param	cmd_len: размер команды (если ноль, то вычисляется размер строки)
+ * @param	cmnd_num: номер команды в расписании
+ */
 void Main_AT_Send(U8 *at_cmd, U16 cmd_len, U8 cmnd_num)
 {
 	if(cmd_len == NULL)
@@ -176,12 +176,12 @@ void Main_AT_Send(U8 *at_cmd, U16 cmd_len, U8 cmnd_num)
 }
 
 /**
-	*	@brief	Aux_AT_send()
-	*	@note		Отправка АТ команд модему по aux каналу
-	*	@param	at_cmd: ссылка на строку с командой
-	* @param	cmd_len: размер команды (если ноль, то вычисляется размер строки)
-	*	@param	cmnd_num: номер команды в расписании
-	*/
+ * @brief	Aux_AT_send()
+ * @note	Отправка АТ команд модему по aux каналу
+ * @param	at_cmd: ссылка на строку с командой
+ * @param	cmd_len: размер команды (если ноль, то вычисляется размер строки)
+ * @param	cmnd_num: номер команды в расписании
+ */
 void Aux_AT_Send(char *at_cmd, U16 cmd_len, U8 cmnd_num)
 {
 	if(cmd_len == NULL)
@@ -199,12 +199,12 @@ void Aux_AT_Send(char *at_cmd, U16 cmd_len, U8 cmnd_num)
 }
 
 /**
-	*	@brief	Main_AT_Command_Handler()
-	*	@note		Обработчик ответов модема на AT команды по main каналу
-	* @param	at_stat: статус работы main канала
-	*	@param	cmnd_num: номер команды в расписании
-	*	@param	data_point: указатель на принятые данные
-	*/
+ * @brief	Main_AT_Command_Handler()
+ * @note	Обработчик ответов модема на AT команды по main каналу
+ * @param	at_stat: статус работы main канала
+ * @param	cmnd_num: номер команды в расписании
+ * @param	data_point: указатель на принятые данные
+ */
 void Main_AT_Command_Handler(Main_AT_Status_t at_stat, U8 cmnd_num, char* data_point)
 {
 	int res = 0;
@@ -522,9 +522,9 @@ void Aux_AT_Command_Handler(Aux_AT_Status_t at_stat, uint8_t cmnd_num, char* dat
 }
 
 /**
-	*	@brief	__AT_Modem_Start()
-	*	@note		Начало работы с модемом
-	*/
+ * @brief	__AT_Modem_Start()
+ * @note	Начало работы с модемом
+ */
 void __AT_Modem_Start(void)
 {
 	U8 cmnd_num = AT_Start_Schedule;
@@ -564,9 +564,9 @@ void __AT_Modem_Start(void)
 }
 
 /**
-	*	@brief	__AT_Socket_Open()
-	*	@note		Поэтапное открытие сокета
-	*/
+ * @brief	__AT_Socket_Open()
+ * @note	Поэтапное открытие сокета
+ */
 void __AT_Socket_Open(void)
 {
 	char at_tmp[64];
@@ -619,9 +619,9 @@ void __AT_Socket_Open(void)
 }
 
 /**
-	*	@brief	__AT_Socket_Send()
-	*	@note		Поэтапная отправка через сокет
-	*/
+ * @brief	__AT_Socket_Send()
+ * @note	Поэтапная отправка через сокет
+ */
 void __AT_Socket_Send(void)
 {
 	char at_tmp[32];
@@ -642,9 +642,9 @@ void __AT_Socket_Send(void)
 }
 
 /**
-	*	@brief	__AT_Socket_Receive()
-	*	@note		Поэтапная отправка через сокет
-	*/
+ * @brief	__AT_Socket_Receive()
+ * @note	Поэтапная отправка через сокет
+ */
 void __AT_Socket_Receive(void)
 {
 	U8 cmnd_num = AT_Socket_Receive_Schedule;
@@ -663,9 +663,9 @@ void __AT_Socket_Receive(void)
 }
 
 /**
-	*	@brief	__AT_Socket_Close()
-	*	@note		Поэтапное закрытие сокета
-	*/
+ * @brief	__AT_Socket_Close()
+ * @note	Поэтапное закрытие сокета
+ */
 void __AT_Socket_Close(void)
 {
 	U8 cmnd_num = AT_Socket_Close_Schedule;
@@ -682,9 +682,9 @@ void __AT_Socket_Close(void)
 }
 
 /**
-	*	@brief	__AT_Modem_Poll()
-	*	@note		Периодический опрос модема
-	*/
+ * @brief	__AT_Modem_Poll()
+ * @note	Периодический опрос модема
+ */
 void __AT_Modem_Poll(void)
 {
 	U8 cmnd_num = AT_Modem_Poll_Schedule;
@@ -706,9 +706,9 @@ void __AT_Modem_Poll(void)
 }
 
 /**
-	*	@brief	__AT_Balance()
-	*	@note		Запрос баланса
-	*/
+ * @brief	__AT_Balance()
+ * @note	Запрос баланса
+ */
 void __AT_Balance(void)
 {	
 	char at_tmp[16];
@@ -730,9 +730,9 @@ void __AT_Balance(void)
 }
 
 /**
-	*	@brief	change_sim()
-	*	@note		Сменить сим карту, перезапустить модем, сбросить статусы
-	*/
+ * @brief	change_sim()
+ * @note	Сменить сим карту, перезапустить модем, сбросить статусы
+ */
 void change_sim(void)
 {
 	CHANGE_SIM();	// Поменять SIM карту
@@ -744,9 +744,9 @@ void change_sim(void)
 }
 
 /**
-	*	@brief	select_sim1()
-	*	@note		Выбрать SIM1, перезапустить модем, сбросить статусы
-	*/
+ * @brief	select_sim1()
+ * @note	Выбрать SIM1, перезапустить модем, сбросить статусы
+ */
 void select_sim1(void)
 {
 	SELECT_SIM1();	// Работать с SIM1
@@ -757,9 +757,9 @@ void select_sim1(void)
 }
 
 /**
-	*	@brief	select_sim2()
-	*	@note		Выбрать SIM2, перезапустить модем, сбросить статусы
-	*/
+ * @brief	select_sim2()
+ * @note	Выбрать SIM2, перезапустить модем, сбросить статусы
+ */
 void select_sim2(void)
 {
 	SELECT_SIM2();	// Работать с SIM2
@@ -770,13 +770,13 @@ void select_sim2(void)
 }
 
 /**
-	*	@brief	gprs_write_msg()
-	*	@note		Добавить сообщение в структуру AT_Socket_Msg для отправки через сокет
-	* @param	buff: буфер с сообщением
-	* @param	len: размер сообщения
-	* @return 1: сокет не готов к отправке
-	*					0: отправка сообщения через сокет будет осуществлена
-	*/
+ * @brief	gprs_write_msg()
+ * @note	Добавить сообщение в структуру AT_Socket_Msg для отправки через сокет
+ * @param	buff: буфер с сообщением
+ * @param	len: размер сообщения
+ * @return	1:сокет не готов к отправке
+ *		0:отправка сообщения через сокет будет осуществлена
+ */
 bool gprs_write_msg(U8* buff, U16 len)
 {
 	if(Main_AT_Status != AT_Socket_Ready) 
@@ -795,21 +795,21 @@ bool gprs_write_msg(U8* buff, U16 len)
 }
 
 /**
-	*	@brief	msg_processed()
-	*	@note		Сообщение обработано. Снять флаг
-	*/
+ * @brief	msg_processed()
+ * @note	Сообщение обработано. Снять флаг
+ */
 void msg_processed(void)
 {
 	AT_Socket_Rx_Msg.msg_received = false;
 }
 
 /**
-	*	@brief	gprs_recv_msg()
-	*	@note		Отдать полученное сообщение
-	* @param	buff: буфер в который будет записано полученное сообщение
-	* @return 1: нет принятых сообщений
-	*					0: сообщение принято и записано в буфер
-	*/
+ * @brief	gprs_recv_msg()
+ * @note	Отдать полученное сообщение
+ * @param	buff: буфер в который будет записано полученное сообщение
+ * @return	1:нет принятых сообщений
+ *		0:сообщение принято и записано в буфер
+ */
 bool gprs_recv_msg(U8* buff)
 {
 	if(!AT_Socket_Rx_Msg.msg_received) 
@@ -823,9 +823,9 @@ bool gprs_recv_msg(U8* buff)
 }
 
 /**
-	*	@brief	Main_AT_Check_Recv_Buff()
-	*	@note		Изучение приёмного буфера main канала на предмет сообщений от модема
-	*/
+ * @brief	Main_AT_Check_Recv_Buff()
+ * @note	Изучение приёмного буфера main канала на предмет сообщений от модема
+ */
 void Main_AT_Check_Recv_Buff(void)
 {
 	int res = 0;
@@ -917,9 +917,9 @@ void Main_AT_Check_Recv_Buff(void)
 }
 
 /**
-	*	@brief	Aux_AT_Check_Recv_Buff()
-	*	@note		Изучение приёмного буфера aux канала на предмет сообщений от модема
-	*/
+ * @brief	Aux_AT_Check_Recv_Buff()
+ * @note	Изучение приёмного буфера aux канала на предмет сообщений от модема
+ */
 void Aux_AT_Check_Recv_Buff(void)
 {
 	int ires = 0;
