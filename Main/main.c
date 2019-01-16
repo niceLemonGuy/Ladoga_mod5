@@ -81,13 +81,13 @@ __task void t_Init (void)
 	// Тестовый режим
 	Device_Test_Check();
 	
-	tid_Time_Counter				= os_tsk_create_user(t_Time_Counter, 2, t_Time_Counter_stack, sizeof t_Time_Counter_stack);												// Start task t_Time_Counter
-	tid_Touch_Memory				= os_tsk_create_user(t_Touch_Memory, 8, t_Touch_Memory_stack, sizeof t_Touch_Memory_stack);												// Start task t_Touch_Memory
-	tid_Brshs_Handler				= os_tsk_create_user(t_Brshs_Handler, 4, t_Brshs_Handler_stack, sizeof t_Brshs_Handler_stack);										// Start task t_Brshs_Handler
-	tid_Device_Handler			= os_tsk_create_user(t_Device_Handler, 1, t_Device_Handler_stack, sizeof t_Device_Handler_stack);									// Start task t_Device_Handler
-	tid_Aux_Modem_Handler		= os_tsk_create_user(t_Aux_Modem_Handler, 5, t_Aux_Modem_Handler_stack, sizeof t_Aux_Modem_Handler_stack);				// Start task t_Aux_Modem_Handler
-	tid_Main_Modem_Handler	= os_tsk_create_user(t_Main_Modem_Handler, 7, t_Main_Modem_Handler_stack, sizeof t_Main_Modem_Handler_stack);			// Start task t_Main_Modem_Handler
-	tid_Indication_Manager	= os_tsk_create_user(t_Indication_Manager, 3, t_Indication_Manager_stack, sizeof t_Indication_Manager_stack);			// Start task t_Indication_Manager
+	tid_Time_Counter	= os_tsk_create_user(t_Time_Counter, 2, t_Time_Counter_stack, sizeof t_Time_Counter_stack);				// Start task t_Time_Counter
+	tid_Touch_Memory	= os_tsk_create_user(t_Touch_Memory, 8, t_Touch_Memory_stack, sizeof t_Touch_Memory_stack);				// Start task t_Touch_Memory
+	tid_Brshs_Handler	= os_tsk_create_user(t_Brshs_Handler, 4, t_Brshs_Handler_stack, sizeof t_Brshs_Handler_stack);				// Start task t_Brshs_Handler
+	tid_Device_Handler	= os_tsk_create_user(t_Device_Handler, 1, t_Device_Handler_stack, sizeof t_Device_Handler_stack);			// Start task t_Device_Handler
+	tid_Aux_Modem_Handler	= os_tsk_create_user(t_Aux_Modem_Handler, 5, t_Aux_Modem_Handler_stack, sizeof t_Aux_Modem_Handler_stack);		// Start task t_Aux_Modem_Handler
+	tid_Main_Modem_Handler	= os_tsk_create_user(t_Main_Modem_Handler, 7, t_Main_Modem_Handler_stack, sizeof t_Main_Modem_Handler_stack);		// Start task t_Main_Modem_Handler
+	tid_Indication_Manager	= os_tsk_create_user(t_Indication_Manager, 3, t_Indication_Manager_stack, sizeof t_Indication_Manager_stack);		// Start task t_Indication_Manager
 	tid_ZA_Protocol_Handler	= os_tsk_create_user(t_ZA_Protocol_Handler, 6, t_ZA_Protocol_Handler_stack, sizeof t_ZA_Protocol_Handler_stack);	// Start task t_ZA_Protocol_Handler
 	
 	Device_Test_Handler(Version_Num);
