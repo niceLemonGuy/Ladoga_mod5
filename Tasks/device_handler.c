@@ -145,60 +145,6 @@ void Device_Test_Handler(char *vers_num)
 	*/
 void Device_ARM(U8 user)
 {
-	U8 i;
-	bool OK = true;
-	
-	if((!Device_Status.on_line && !Device_Status.test_mode) || TAMPER_INPUT_READ())
-	{
-		// Индикация неудачной постановки
-		Ind_Tm_peep_num(3);
-		return; // Нет связи и не тестовые режим. Постановка на охрану запрещена
-	}
-	
-	if(Device_Status.guard)
-	{
-		Ind_Tm_peep();
-		return; // Устройство и так на охране
-	}
-	
-	// Перечислить все возможные УО
-	for(i = 0; i < MAX_UO_NUM; i++)
-	{
-		// Поиск УО по сетевому адресу
-		if(RF_UO_Data[i].Info.Chan_info._Class == RF_CLASS_1)
-		{// Найден УО
-			if(RF_UO_Data[i].Status.CL_1.Ch_stat || RF_UO_Data[i].Status.CL_1.UO_stat.All8)
-			{// УО не готов к постановке
-				// Отправить сообщение о невзятии
-				Event_Queue_Make(XPR_EVCLASS_ALARM, XPR_EVCLASS_ALARM_ARMFAIL, ACT_EVENT_START, DEVICE_ADDR, user);
-				OK = false;
-				break;
-			}
-		}
-	}
-	if(!OK)
-	{
-		// Поиск УО по сетевому адресу
-		if(RF_UO_Data[i].Info.Chan_info._Class == RF_CLASS_1)
-		{// Найден УО
-			if(RF_UO_Data[i].Status.CL_1.Ch_stat || RF_UO_Data[i].Status.CL_1.UO_stat.All8)
-			{// УО не готов к постановке
-				// Отправить сообщение о неготовности УО
-				Event_Queue_Make(XPR_EVCLASS_INFO, XPR_EVCLASS_INFO_UO_NOT_READY, ACT_EVENT_START, RF_UO_Data[i].Info.Chan_info.Ch_addr, 0);
-				// Индикация неудачной постановки
-				Ind_Tm_peep_num(3);
-			}
-		}
-	}
-	else
-	{// Проверка на готовность пройдена
-		// Отправить сообщение о постановке на охрану
-		Event_Queue_Make(XPR_EVCLASS_ARM, XPR_EVCLASS_ARM_ARM, ACT_EVENT_START, DEVICE_ADDR, user);
-		Device_Status.guard = true;	// Поднять флаг "ОХРАНА"
-		Ind_Tm_led_num(30);	// Индикация постановки на охрану
-		Ind_Tm_peep_time(2000);	// Звуковое оповещение постановки на охрану
-		LED_GUARD_RED();
-	}
 }
 
 /** 
@@ -208,17 +154,6 @@ void Device_ARM(U8 user)
 	*/
 void Device_DISARM(U8 user)
 {
-	if(!Device_Status.guard)
-	{
-		Ind_Tm_peep();
-		return;
-	}
-	// Отправить сообщение о снятии с охраны
-	Event_Queue_Make(XPR_EVCLASS_ARM, XPR_EVCLASS_ARM_ARM, ACT_EVENT_TERMINATION, DEVICE_ADDR, user);
-	Device_Status.guard = false;	// Опустить флаг "ОХРАНА"
-	Device_Status.alarm = false;	// Опустить флаг "ТРЕВОГА"
-	Ind_Tm_peep();	// Оповестить об окончании снятия с охраны звуковым сигналом
-	LED_GUARD_GREEN();
 }
 
 
@@ -230,43 +165,6 @@ __task void t_Device_Handler(void)
 	for(;;)
 	{
 		os_dly_wait(200);
-		
-		// События по УОО
-		if(Device_Status.old.all != Device_Status.new.all)
-		{// Если изменился статус УОО
-			if(!Device_Status.guard) // Не на охране
-			{
-				if(Device_Status.old.acb_err != Device_Status.new.acb_err) { // Состояние аккумуляторной батареи
-					if(Event_Queue_Make(XPR_EVCLASS_POWER, XPR_EVCLASS_POWER_BATTLOW, Device_Status.new.acb_err, DEVICE_ADDR, 0)) // Батарея разряжена
-						Device_Status.old.acb_err = Device_Status.new.acb_err; // Обновить статус 
-				}
-				if(Device_Status.old.v220_err != Device_Status.new.v220_err) { // Состояние основного питания
-					if(Event_Queue_Make(XPR_EVCLASS_POWER, XPR_EVCLASS_POWER_RESERVE, Device_Status.new.v220_err, DEVICE_ADDR, 0)) // Переход на резервное элеткропитание
-						Device_Status.old.v220_err = Device_Status.new.v220_err; // Обновить статус 
-				}				
-				if(Device_Status.old.sabotage != Device_Status.new.sabotage) { // Состояние корпуса
-					if(Event_Queue_Make(XPR_EVCLASS_INTERNAL, XPR_EVCLASS_SABOTAGE_TAMPER, Device_Status.new.sabotage, DEVICE_ADDR, 0))  // Корпус вскрытие (не тревожное)
-						Device_Status.old.sabotage = Device_Status.new.sabotage; // Обновить статус 
-				}
-			}
-			else // На охране
-			{
-				if(Device_Status.old.acb_err != Device_Status.new.acb_err) { // Состояние аккумуляторной батареи
-					if(Event_Queue_Make(XPR_EVCLASS_MALFUNCTION, XPR_EVCLASS_MALFUNCTION_SUPPLY, Device_Status.new.acb_err, DEVICE_ADDR, 0)) // Нарушено питание
-						if(Event_Queue_Make(XPR_EVCLASS_POWER, XPR_EVCLASS_POWER_BATTLOW, Device_Status.new.acb_err, DEVICE_ADDR, 0)) // Батарея разряжена
-							Device_Status.old.acb_err = Device_Status.new.acb_err; // Обновить статус 
-				}
-				if(Device_Status.old.v220_err != Device_Status.new.v220_err) { // Состояние основного питания
-					if(Event_Queue_Make(XPR_EVCLASS_MALFUNCTION, XPR_EVCLASS_MALFUNCTION_SUPPLY, Device_Status.new.v220_err, DEVICE_ADDR, 0)) // Нарушено питание
-						if(Event_Queue_Make(XPR_EVCLASS_POWER, XPR_EVCLASS_POWER_RESERVE, Device_Status.new.v220_err, DEVICE_ADDR, 0)) // Переход на резервное элеткропитание
-							Device_Status.old.v220_err = Device_Status.new.v220_err; // Обновить статус 
-				}				
-				if(Device_Status.old.sabotage != Device_Status.new.sabotage) { // Состояние корпуса
-					if(Event_Queue_Make(XPR_EVCLASS_SABOTAGE, XPR_EVCLASS_SABOTAGE_TAMPER, Device_Status.new.sabotage, DEVICE_ADDR, 0)) // Корпус вскрытие
-						Device_Status.old.sabotage = Device_Status.new.sabotage; // Обновить статус 
-				}
-			}
-		}
 		
 		// Start ADC1 Software Conversion
 		ADC_SoftwareStartConvCmd(ADC1, ENABLE);
