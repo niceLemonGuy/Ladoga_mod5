@@ -125,13 +125,11 @@ __task void t_Indication_Manager(void)
 			
 			if(alarm_old_stat == false)
 			{
-				//BRSHS_Make_Cmnd(RF_CLASS_2, CMD_0x09, 3, 1, 3, 6);
 				alarm_old_stat = true;
 			}
 		}
 		else if(!Device_Status.guard && alarm_old_stat == true)
 		{
-			//BRSHS_Make_Cmnd(RF_CLASS_2, CMD_0x09, 3, 1, 0, 0);
 			alarm_old_stat = false;
 		}
 	}
